@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Player_Manager : MonoBehaviour {
     private Rigidbody rb;
-    public float speed = 200;
-    public float sprintSpeed = 150;
-    public float rotationSpeed = 100;
-    public float jumpForce = 175;
+    public float speed = 2;
+    public float sprintSpeed = 6;
+    public float rotationSpeed = 1;
+    public float jumpForce = 1;
     private float vertical;
     private float horizontal;
     private bool isGrounded;
@@ -17,29 +17,18 @@ public class Player_Manager : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        vertical = Input.GetAxis("Vertical"); 
-        horizontal = Input.GetAxis("Horizontal");
+        vertical = Input.GetAxisRaw("Vertical"); 
+        horizontal = Input.GetAxisRaw("Horizontal");
+        rb.velocity = new Vector3(horizontal, rb.velocity.y, vertical) * speed * Time.fixedDeltaTime;
+
+        if(Input.GetKey(KeyCode.LeftShift)) {
+            rb.velocity = new Vector3(horizontal, rb.velocity.y, vertical) * speed * sprintSpeed * Time.fixedDeltaTime;
+        }
 
         if(Input.GetAxis("Jump") > 0) {
             if(isGrounded) {
-                rb.AddForce(transform.up * jumpForce);
+                rb.AddForce(transform.up * jumpForce, ForceMode.Acceleration);
             }
-        }
-
-        Vector3 velocity = (transform.forward * vertical) * speed * Time.fixedDeltaTime;
-        velocity.y = rb.velocity.y;
-        rb.velocity = velocity;
-
-        if(Input.GetKey(KeyCode.A) ||Input.GetKey(KeyCode.D)) { // This one is fucked, fix it.
-            Vector3 velocityRightLeft = (transform.right * horizontal) * speed * Time.fixedDeltaTime;
-            velocityRightLeft.y = rb.velocity.x;
-            rb.velocity = velocityRightLeft;
-        }
-    
-        if(Input.GetKey(KeyCode.LeftShift)) {
-            Vector3 sprintVelocity = (transform.forward * vertical) * speed * sprintSpeed * Time.fixedDeltaTime;
-            sprintVelocity.y = rb.velocity.y;
-            rb.velocity = sprintVelocity;
         }
     }
 
