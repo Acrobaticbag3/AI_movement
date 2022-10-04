@@ -4,41 +4,45 @@ using UnityEngine;
 
 public class Player_Manager : MonoBehaviour {
     private Rigidbody rb;
-    public float speed = 2;
-    public float sprintSpeed = 6;
-    public float rotationSpeed = 1;
-    public float jumpForce = 1;
+    public float speed = 150f;
+    public float sprintSpeed = 2f;
+    public float jumpForce = 175f;
     private float vertical;
     private float horizontal;
     private bool isGrounded;
    
     void Start() {
         rb = GetComponent<Rigidbody>();
-    }
+    }  
 
     void FixedUpdate() {
-        vertical = Input.GetAxisRaw("Vertical"); 
-        horizontal = Input.GetAxisRaw("Horizontal");
-        rb.velocity = new Vector3(horizontal, rb.velocity.y, vertical) * speed * Time.fixedDeltaTime;
+        vertical = Input.GetAxisRaw("Vertical"); //Gets vertical input
+        horizontal = Input.GetAxisRaw("Horizontal"); //Gets horizontal input
 
-        if(Input.GetKey(KeyCode.LeftShift)) {
-            rb.velocity = new Vector3(horizontal, rb.velocity.y, vertical) * speed * sprintSpeed * Time.fixedDeltaTime;
+        //rb.velocity cant be used as a variable, because of course it cant. so lets turn it into one so we can use it as such.
+        Vector3 v = rb.velocity; 
+        v.x = horizontal * speed * Time.fixedDeltaTime;
+        v.z = vertical * speed * Time.fixedDeltaTime;
+        rb.velocity = v;
+
+        if(Input.GetKey(KeyCode.LeftShift)) { //Sprinting 
+            rb.velocity = v * speed * sprintSpeed/3 * Time.fixedDeltaTime;
         }
 
-        if(Input.GetAxis("Jump") > 0) {
+        if(Input.GetAxis("Jump") > 0) { //Jumping
             if(isGrounded) {
-                rb.AddForce(transform.up * jumpForce, ForceMode.Acceleration);
+                rb.AddForce(transform.up * jumpForce);
             }
         }
     }
 
-    void OnCollisionEnter(Collision collision) {
+    void OnCollisionEnter(Collision collision) { //Are we grounded?
         if(collision.gameObject.tag == ("Ground")) {
             isGrounded = true;
         }
     }
     
-    void OnCollisionExit(Collision collision) {
+    void OnCollisionExit(Collision collision) { //Are we grounded?
         if(collision.gameObject.tag == ("Ground")) {
             isGrounded = false;
         }
